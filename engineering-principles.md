@@ -7,7 +7,17 @@ description: Core engineering principles and tech stack preferences for all soft
 
 These principles define how engineering work should be approached. They aren't a checklist — they're a mindset. Read them once, internalize them, and apply them throughout your work without being prompted.
 
-## 1. Rigorous Engineering Attitude
+## 1. Context Management
+
+Long conversations degrade the quality of reasoning — attention drifts, earlier constraints get forgotten, subtle inconsistencies creep in. When you notice this happening:
+
+- Flag it explicitly. Tell the user that the accumulated context is affecting your ability to track the problem correctly.
+- Be specific about what's at risk (e.g., "I may be losing track of the constraints we established earlier around X").
+- Recommend that the user run `/compact` to compress the conversation context.
+
+Don't silently degrade. Surface the problem early so it can be addressed before it causes real mistakes.
+
+## 2. Rigorous Engineering Attitude
 
 Treat every engineering problem with the seriousness of a senior engineer reviewing a production system. Concretely:
 
@@ -17,7 +27,7 @@ Treat every engineering problem with the seriousness of a senior engineer review
 
 Rigor is not the same as slowness. A rigorous engineer catches the wrong assumption in minute one, not after two days of implementation.
 
-## 2. Tech Stack Preferences
+## 3. Tech Stack Preferences
 
 When you have discretion over technology choices, follow these defaults unless explicitly told otherwise:
 
@@ -30,7 +40,7 @@ When you have discretion over technology choices, follow these defaults unless e
 
 Don't deviate without a good reason and explicit discussion. Consistency across projects reduces cognitive overhead and maintenance burden.
 
-## 3. Type Safety Requirements
+## 4. Type Safety Requirements
 
 Code that lives beyond a single use must be strongly typed. The rule of thumb:
 
@@ -39,11 +49,24 @@ Code that lives beyond a single use must be strongly typed. The rule of thumb:
 
 Type safety is not overhead — it's one of the cheapest and most effective ways to eliminate entire categories of bugs before they happen. Treat it as infrastructure, not optional polish.
 
-## 4. Plan Before Coding
+**No progressive typing.** All non-throwaway code must have complete, rigorous type definitions from the design stage — even if it slows down early development. Temporarily relaxing type requirements with the intention of filling them in later is not permitted under any circumstances.
+
+**Strict prohibition on type escaping.** Never bypass the type system through any means, including but not limited to:
+- `as` type assertions used to force a type without a proper type guard
+- Using the result of `JSON.parse` or other dynamic inputs directly without explicit type validation
+- Index signatures, `any`, or JSON path access patterns that evade type checking
+
+If a type boundary exists, cross it safely: use type guards, validation libraries (e.g., Zod), or explicit narrowing. The compiler's trust must be earned, not coerced.
+
+## 5. Plan Before Coding
 
 Never start writing code without a written plan. This is a hard rule.
 
-Before any implementation:
+Before any implementation, first enumerate the scenarios the feature must handle:
+- At least **3 core business scenarios** with explicit acceptance criteria for each
+- At least **2 boundary / error scenarios** that define how the system behaves under abnormal conditions
+
+Only after that, proceed with the implementation plan:
 1. Write out what you're going to build, how, and why — enough detail that someone else could follow it
 2. Identify open questions and unconfirmed assumptions, and surface them explicitly before proceeding
 3. Get confirmation on the plan before writing a single line of implementation
@@ -51,16 +74,6 @@ Before any implementation:
 If you discover a gap mid-implementation, stop and revise the plan before continuing. The discipline of planning forces you to think through the full problem space instead of getting trapped by premature implementation decisions.
 
 When in doubt, plan more. A plan that takes 10 minutes to write can save hours of rework.
-
-## 5. Context Management
-
-Long conversations degrade the quality of reasoning — attention drifts, earlier constraints get forgotten, subtle inconsistencies creep in. When you notice this happening:
-
-- Flag it explicitly. Tell the user that the accumulated context is affecting your ability to track the problem correctly.
-- Be specific about what's at risk (e.g., "I may be losing track of the constraints we established earlier around X").
-- Recommend that the user run `/compact` to compress the conversation context.
-
-Don't silently degrade. Surface the problem early so it can be addressed before it causes real mistakes.
 
 ## 6. Core Engineering Mindset
 
@@ -70,5 +83,18 @@ Every non-trivial system should be designed with these properties in mind from t
 - **Scalability**: Will this hold up under 10x load or data volume? You don't need to over-engineer for scale, but don't build in accidental bottlenecks either.
 - **Maintainability**: Will a developer unfamiliar with this code understand it in 6 months? Favor clarity over cleverness.
 - **Concurrency awareness**: Always assume concurrent access is possible unless proven otherwise. Think through race conditions, shared mutable state, and atomicity requirements — even when they seem unlikely. Systems that work fine in development often break under concurrent production load.
+- **Observability**: Can you quickly diagnose and root-cause failures when they happen? Build in observability from the start, not as an afterthought. This includes structured, context-rich logging, exposure of key business and technical metrics, and traceability for critical workflows. Never ship black-box code that cannot be debugged in production.
 
-These aren't independent concerns — they reinforce each other. A system designed for maintainability is easier to make robust. A system designed with concurrency in mind is easier to scale. Build with all four in view from the start.
+These aren't independent concerns — they reinforce each other. A system designed for maintainability is easier to make robust. A system designed with concurrency in mind is easier to scale. Build with all five in view from the start.
+
+## 7. Documentation as Code
+
+Documentation is not an afterthought or a separate artifact — it is an inseparable part of the codebase, living and evolving alongside the code it describes. Read this once, internalize it, and enforce it for every code change, no exceptions.
+
+Treat documentation with the same rigor as production code. Concretely:
+- **Mandatory synchronous updates**: Any change to code logic, APIs, dependencies, architecture, or business rules must be accompanied by corresponding documentation updates in the same commit. Code that changes behavior without updating the relevant documentation will not be approved.
+- **Required documentation coverage**: Every project must maintain, at a minimum:
+  1. **ADRs (Architecture Decision Records)**: Document every meaningful technical choice, including the background, alternatives considered, rationale for the final decision, and explicit tradeoffs made.
+  2. **Project README**: Includes environment requirements, quick-start instructions, core configuration explanations, and a basic troubleshooting guide for common issues.
+  3. **Inline comments**: Used exclusively to explain *why* a decision was made, never to repeat what the code already does. Obvious code needs no comments; non-obvious tradeoffs and constraints always do.
+- **Validity maintenance**: Regularly audit documentation to remove or update outdated content, ensuring it always accurately reflects the current state of the codebase. Stale documentation is worse than no documentation at all.
