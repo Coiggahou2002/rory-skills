@@ -108,13 +108,51 @@ Thanks,
 
 ## Step 4: Output format
 
-Produce the email as a single code block or clearly-delimited block that the user can copy-paste directly into their mail client. Do **not** wrap it in prose like "Here's the draft:" followed by commentary — the user wants to grab and go. A short one-line intro ("Draft below — let me know if you want anyone else Cc'd.") is fine, but the email itself should be clean.
+During content iteration, output both the plain-text draft (in a code block for quick reading) **and** write an `.html` file simultaneously. Every revision should update the `.html` file in sync — do not treat HTML generation as a separate final step.
+
+The HTML file is what the user will ultimately copy from. The workflow is:
+
+1. Open the `.html` file in a browser
+2. `Cmd+A` → `Cmd+C` to select and copy the rendered content
+3. Paste into the email client's reply window (preserves formatting as rich text)
 
 If the user has given you their name earlier in the conversation, use it in the Subject and sign-off. Otherwise ask.
 
 ## Step 5: Offer revisions, don't argue
 
 After the draft, invite the user to redirect: tone, length, section ordering, which items to cut. A daily report is a personal artifact — the user knows their manager's taste better than you do. If they say "this is too long, cut it in half," cut it in half without negotiating.
+
+## Email formatting conventions
+
+These rules apply to all email output — both the plain-text draft and the HTML file.
+
+**Typography**
+
+- Body font size: **16px** (industry standard, readable on both desktop and mobile)
+- Font family: `font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;` — each platform gets its best native sans-serif, with Arial as universal fallback
+- Sans-serif only. Do not use serif fonts for business emails.
+- Section headers: bold, slightly larger than body text. Body text: unformatted.
+
+**Style**
+
+- No emojis — they render inconsistently across email clients, appear unprofessional, and are problematic for screen readers
+- Keep the layout clean: white background, no decorative elements (colored bars, borders, card shadows)
+- Max-width 640px to prevent lines stretching too wide on large screens
+
+**HTML rules**
+
+- Use **inline CSS only** — email clients (Gmail, Outlook) strip `<style>` blocks
+- Use `<p>`, `<strong>`, `<ul>`/`<li>`, `<a>` tags. Avoid `<div>` for layout where possible.
+- Do not use `border-radius`, `box-shadow`, `flexbox`, or `grid` — they degrade in Outlook and older clients
+- Line height: 1.6
+
+**Etiquette**
+
+- Greeting follows the **To:** recipient, not Cc. If emailing Jack with Danny Cc'd, write "Hi Jack", not "Hi all" — Cc is the observer seat, not the audience. Only use "Hi all" / "Hi team" when the To: field has multiple people and the email is equally directed at all of them.
+
+## HTML template
+
+Read `template.html` in the same directory as this skill file to get the base HTML structure. Replace the content placeholders with actual content. Omit any section (Key Decisions, Blockers, etc.) that has no content — do not include empty sections.
 
 ## On language
 
