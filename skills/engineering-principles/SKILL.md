@@ -98,3 +98,15 @@ Treat documentation with the same rigor as production code. Concretely:
   2. **Project README**: Includes environment requirements, quick-start instructions, core configuration explanations, and a basic troubleshooting guide for common issues.
   3. **Inline comments**: Used exclusively to explain *why* a decision was made, never to repeat what the code already does. Obvious code needs no comments; non-obvious tradeoffs and constraints always do.
 - **Validity maintenance**: Regularly audit documentation to remove or update outdated content, ensuring it always accurately reflects the current state of the codebase. Stale documentation is worse than no documentation at all.
+
+## 8. Design to Interfaces for Replaceable Components
+
+Whenever you design a component whose implementation is pluggable or externally swappable — database storage, file storage, embedding providers, message queues, caches, auth providers, LLM backends, and the like — always program to an interface, never to a concrete implementation.
+
+This rule holds **even when there is currently only one viable implementation**. You must still introduce an abstraction layer (interface, protocol, trait, or adapter) between your business logic and the concrete backend so that:
+
+- Swapping the implementation later (e.g., Postgres → another DB, local disk → S3, OpenAI embeddings → a self-hosted model) is a localized change, not a cross-cutting rewrite.
+- Tests can substitute fakes or in-memory implementations without touching production code paths.
+- The boundary forces you to think clearly about what your system actually requires from the dependency, rather than leaking backend-specific assumptions throughout the codebase.
+
+Concretely: define the interface first based on the capabilities your business logic needs, then implement the concrete adapter behind it. Never let backend-specific types, error classes, or query idioms leak across the boundary. The short-term cost of the indirection is almost always smaller than the long-term cost of a tightly coupled implementation.
