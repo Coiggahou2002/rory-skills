@@ -1,6 +1,6 @@
 ---
 name: engineering-principles
-description: Core engineering principles and tech stack preferences for all software engineering work. Trigger this skill whenever the user starts a coding task, asks you to build something, makes technology decisions, designs a system, or reviews existing code. This skill defines the engineering standards that apply across all work — always load it at the start of any engineering session, even if the user doesn't explicitly ask for it.
+description: ALWAYS invoke before writing, refactoring, designing, or reviewing any non-trivial code. This contains the user's personal coding rulebook with strict rules that DIFFER from Claude's defaults — mandatory pre-coding planning steps, type safety prohibitions (no `any`, no `as` assertions), interface-first design for swappable components, specific tech stack mandates, and fail-fast error handling policies. Your implementation will be rejected if these aren't loaded first. Covers: building features/APIs/services, refactoring messy code, reviewing for race conditions or production concerns, designing architecture, and planning multi-component systems. Applies to both English and Chinese coding requests. Only skip for trivial tasks: explaining syntax, reading error logs, fixing formatting, resolving dependency errors, cron expressions, or quick throwaway scripts.
 ---
 
 # Engineering Principles
