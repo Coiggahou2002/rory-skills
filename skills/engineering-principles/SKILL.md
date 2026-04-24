@@ -7,6 +7,14 @@ description: Core engineering principles and tech stack preferences for all soft
 
 These principles define how engineering work should be approached. They aren't a checklist — they're a mindset. Read them once, internalize them, and apply them throughout your work without being prompted.
 
+## Scope
+
+This document applies to **production-grade and open-source-quality projects** — long-lived code where correctness, maintainability, and team collaboration matter. Throwaway scripts, one-off data explorations, and quick prototypes are explicitly out of scope; applying this level of rigor to disposable work is counterproductive and should be skipped.
+
+When in doubt about whether a piece of code is "throwaway," err toward treating it as production. Most code labeled "temporary" ends up sticking around, and retroactively adding rigor is far more expensive than building it in from the start.
+
+The absolute-sounding rules below (e.g., "no exceptions," "never bypass") should be read within this scope: they are hard rules *for serious projects*, not universal laws for every line of code ever written.
+
 ## 1. Context Management
 
 Long conversations degrade the quality of reasoning — attention drifts, earlier constraints get forgotten, subtle inconsistencies creep in. When you notice this happening:
@@ -29,7 +37,9 @@ Rigor is not the same as slowness. A rigorous engineer catches the wrong assumpt
 
 ## 3. Tech Stack Preferences
 
-When you have discretion over technology choices, follow these defaults unless explicitly told otherwise:
+This table lists **only the categories where I hold a strong opinion**. For everything not listed here — backend language, database, message queue, testing framework, deployment target, ORM, monitoring stack, etc. — no implicit default is assumed. Choose based on project constraints, team familiarity, and explicit tradeoff discussion rather than defaulting silently to a personal preference.
+
+When you have discretion over a category that *is* listed below, follow these defaults unless explicitly told otherwise:
 
 | Use case | Default choice |
 |---|---|
@@ -38,7 +48,7 @@ When you have discretion over technology choices, follow these defaults unless e
 | Web UI | React (SPA) or Next.js (full-stack / SSR) — choose based on project needs |
 | UI component library | shadcn/ui |
 
-Don't deviate without a good reason and explicit discussion. Consistency across projects reduces cognitive overhead and maintenance burden.
+Don't deviate from a listed default without a good reason and explicit discussion. Consistency across projects reduces cognitive overhead and maintenance burden.
 
 ## 4. Type Safety Requirements
 
@@ -128,3 +138,19 @@ In these situations, the right move is almost never to grind out a custom soluti
 3. Discuss the tradeoffs — dependency cost, learning curve, licensing — against the ongoing cost of maintaining a hand-rolled version.
 
 The core principle: **don't out-engineer problems that someone else has already solved better.** Recognizing "this is the kind of code I shouldn't be writing from scratch" is itself a core engineering skill, and it should be exercised continuously, not only in hindsight after a bug ships.
+
+## 10. Fail Fast, Surface Errors Loudly
+
+Default to **fail-fast** error handling: when something genuinely goes wrong, surface it immediately and loudly rather than absorbing it silently. Silent failures are the most expensive class of bug — they corrupt state, produce subtly wrong outputs, and surface days or weeks later, far from the root cause. A program that crashes with a clear stack trace at the exact moment something goes wrong is drastically cheaper to debug than one that limps along and quietly emits bad data.
+
+Concrete rules:
+
+- **Don't swallow exceptions.** Bare `catch (e) {}` or `except: pass` is almost always wrong. If you must catch, catch the *specific* exception type and state explicitly, in a comment, why continuing is safe.
+- **Don't return sentinel values that mask failure.** Returning `null`, `0`, `[]`, `""`, or `undefined` when something actually went wrong trades a debuggable crash for silent corruption. If the caller can't meaningfully distinguish "no result" from "something broke," raise instead.
+- **Validate at system boundaries and fail hard on violation.** External input — user requests, API responses, config files, messages from queues, JSON parsed from anywhere — must be explicitly validated (Zod, Pydantic, or equivalent) at the boundary. Malformed data must not propagate inward; raise immediately with a descriptive error.
+- **Use assertions for invariants.** If a condition *must* hold for the surrounding code to make sense, assert it. An invariant violation should fail at the line where it's detected, not three calls deeper where the symptom finally surfaces.
+- **Catch only at meaningful boundaries.** Legitimate catch points: top-level request handlers, batch job drivers, explicit retry wrappers, user-facing UI layers. Inner business logic should propagate failures upward, not paper over them locally.
+
+**The exception**: known, expected, recoverable conditions — a transient network timeout with a retry policy, a legitimately optional lookup that returns nothing, an expected empty state — should be handled explicitly at the level that understands them. The rule is "never silent," not "never handle." The distinction: recoverable conditions are anticipated and named; everything else crashes.
+
+Fail-fast is not fragility. A fail-fast system is *more* robust in production, because bugs surface during development, in tests, or in early monitoring — rather than quietly corrupting state until the damage is large enough to be noticed, at which point root-causing is vastly harder.
