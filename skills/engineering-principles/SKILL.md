@@ -110,3 +110,21 @@ This rule holds **even when there is currently only one viable implementation**.
 - The boundary forces you to think clearly about what your system actually requires from the dependency, rather than leaking backend-specific assumptions throughout the codebase.
 
 Concretely: define the interface first based on the capabilities your business logic needs, then implement the concrete adapter behind it. Never let backend-specific types, error classes, or query idioms leak across the boundary. The short-term cost of the indirection is almost always smaller than the long-term cost of a tightly coupled implementation.
+
+## 9. Identify Dirty, Hard-to-Maintain Work Early — Prefer Battle-Tested Libraries
+
+While coding, stay actively alert to changes that are **dirty, fiddly, or inherently hard to maintain** — work where a hand-rolled implementation is likely to be buggy, brittle, or a long-term maintenance burden. The moment you notice you're about to enter such territory, **stop and raise it for discussion** instead of pushing through.
+
+Typical red flags:
+- Heavy regex or string manipulation to bridge subtle syntactic differences between systems (e.g., smoothing over SQLite vs. PostgreSQL dialect differences).
+- Manual parsing, escaping, or serialization of formats that already have mature parsers (SQL, HTML, CSV, dates, URLs, shell commands, etc.).
+- Ad-hoc reimplementation of well-studied problems: retries, rate limiting, connection pooling, schema migration, diffing, etc.
+- Any code where the author privately suspects "this probably has edge cases I'm missing."
+
+In these situations, the right move is almost never to grind out a custom solution. Instead:
+
+1. Pause and explicitly surface the concern — name why the work looks fragile.
+2. Research whether a mature open-source library already solves it (e.g., **SQLAlchemy** for cross-dialect SQL, well-known parser libraries for structured formats, established libraries for retry/backoff, concurrency primitives, etc.).
+3. Discuss the tradeoffs — dependency cost, learning curve, licensing — against the ongoing cost of maintaining a hand-rolled version.
+
+The core principle: **don't out-engineer problems that someone else has already solved better.** Recognizing "this is the kind of code I shouldn't be writing from scratch" is itself a core engineering skill, and it should be exercised continuously, not only in hindsight after a bug ships.
