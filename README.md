@@ -10,6 +10,7 @@ A collection of custom [Claude Code skills](https://docs.anthropic.com/en/docs/c
 | [daily-report-email](./skills/daily-report-email/SKILL.md) | Draft send-ready daily/weekly status report emails (To/Cc/Bcc/Subject/Body) from a dump of what you did, structured as Done / Key Decisions / Blockers / Next. |
 | [release-pipeline-patterns](./skills/release-pipeline-patterns/SKILL.md) | Design and debug GitHub Actions release pipelines for open-source npm packages: label-driven version bumps, concurrency safety, npm publish + provenance, binary builds, CHANGELOG automation, alpha previews, merge queue. |
 | [open-source-pr](./skills/open-source-pr/SKILL.md) | Structured workflow for contributing PRs to open-source projects: deduplication search, contribution guideline review, root cause investigation with reproduction, minimal implementation with dual-sided tests, PR title/body conventions, and submission etiquette. |
+| [pe-valuation-analyzer](./skills/pe-valuation-analyzer/SKILL.md) | P/E valuation analysis framework: reverse-engineer market expectations from a stock's P/E ratio, cross-check against actual growth data, and judge whether the current valuation leans optimistic, fair, or pessimistic. |
 
 ## Install
 

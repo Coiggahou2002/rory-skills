@@ -154,3 +154,17 @@ Concrete rules:
 **The exception**: known, expected, recoverable conditions — a transient network timeout with a retry policy, a legitimately optional lookup that returns nothing, an expected empty state — should be handled explicitly at the level that understands them. The rule is "never silent," not "never handle." The distinction: recoverable conditions are anticipated and named; everything else crashes.
 
 Fail-fast is not fragility. A fail-fast system is *more* robust in production, because bugs surface during development, in tests, or in early monitoring — rather than quietly corrupting state until the damage is large enough to be noticed, at which point root-causing is vastly harder.
+
+## 11. No Magic Strings, No Magic Numbers
+
+Never embed a literal string or numeric constant directly in code. Extract it into a named constant — **even if it only appears once**.
+
+This is one of the most common mistakes in AI-generated code: dropping a raw `"pending"`, `3600`, `"/api/v1/users"`, or `0.85` inline because it seems obvious in context. It's not. The problem surfaces later: when the value needs to change, you have to hunt through the codebase to find every occurrence, and it's easy to miss one. A named constant makes the change a single-line edit and eliminates that risk entirely.
+
+Concretely:
+- **Status strings and enum-like values**: `"pending"`, `"active"`, `"failed"` → define as constants (`STATUS_PENDING`, `STATUS_ACTIVE`, etc.) or use a proper enum.
+- **Numeric thresholds, limits, and intervals**: `30`, `1000`, `0.95` → name them (`MAX_RETRY_COUNT`, `TIMEOUT_MS`, `SIMILARITY_THRESHOLD`).
+- **URLs, paths, keys, and identifiers**: `"/api/v1/..."`, `"Content-Type"`, `"user_id"` → extract to constants, especially if they define a contract or are referenced across modules.
+- **Configuration values**: anything that might reasonably differ between environments (port numbers, batch sizes, rate limits) should be a constant at minimum, or better yet, read from configuration.
+
+The named constant serves as documentation — it tells the reader *what this value means*, not just what it is. `CACHE_TTL_SECONDS = 3600` is self-evident; a bare `3600` in a function call is not. The cost of extraction is near zero; the benefit compounds over time.
