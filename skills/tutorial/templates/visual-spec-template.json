@@ -1,0 +1,22 @@
+{
+  "title": "Tutorial Chapter Visual Pack",
+  "chapters": [
+    {
+      "id": "chapter-01",
+      "title": "The First Mental Model",
+      "diagram_type": "flow",
+      "layout_note": "A flow is the clearest grammar because this chapter teaches a transformation sequence.",
+      "summary": "Show the beginner path from a confusing input to a usable mental model.",
+      "mermaid": "flowchart LR\n  A[\"Raw topic\"] --> B[\"Key question\"]\n  B --> C[\"Mental model\"]\n  C --> D[\"First example\"]",
+      "caption": "A beginner learns faster when the first chapter turns confusion into one usable model."
+    },
+    {
+      "id": "chapter-02",
+      "title": "How The Pieces Fit",
+      "diagram_type": "layer",
+      "summary": "Show the topic as stacked levels so the learner can place new terms.",
+      "mermaid": "flowchart TD\n  A[\"User goal\"] --> B[\"Workflow\"]\n  B --> C[\"Core concepts\"]\n  C --> D[\"Tools or implementation\"]\n  D --> E[\"Tradeoffs\"]",
+      "caption": "The layers separate what the learner wants from how the system works."
+    }
+  ]
+}
