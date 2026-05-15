@@ -106,6 +106,69 @@ Thanks,
 
 **Next bullets** should be specific enough that the manager could redirect you if they disagreed with the priority. "Keep working on the wizard" is too vague; "Finish the wizard backfill step and hand to Danny for testing" is redirectable.
 
+## Writing philosophy
+
+These principles govern tone, abstraction level, and editorial judgment across the entire report.
+
+### Write for the manager, not for engineers
+
+The manager doesn't know (or care about) framework-specific jargon like "RLS", "ref-contract-validation stage", or "React/TypeScript". Describe what something *does* in plain terms, not what it's *called* in the codebase. If a technical term doesn't help the manager make a decision or redirect priorities, drop it.
+
+- Good: "ORM queries on Pages, Artifacts, and Links are now auto-filtered by actor/space permissions."
+- Bad: "Implemented application-layer Row-Level Security for collection queries (AIM-231)."
+
+### Front-load the purpose
+
+Lead with *why* something matters, not *what* was done. The manager should understand the significance from the first few words.
+
+- Good: "INCIDENT defense: deployed a cron job on Aliyun Function Compute..."
+- Bad: "Deployed a cron job on Aliyun Function Compute... — second line of defense."
+
+### Classify, don't enumerate
+
+When listing exceptions or incomplete items, use category labels instead of individual function names. The manager cares about coverage gaps, not API signatures.
+
+- Good: "a few remain (embedding-based, thread-based, and session-based)"
+- Bad: "a few remain (`get_thread_messages`, `get_thread_summary`, `read_retrieval_session`, `search_retrieval_history`)"
+
+### Bug fixes need a bar to include
+
+Not every bug fix deserves a bullet. If the fix is too implementation-specific to matter to the manager, drop it entirely. Only include fixes that affect user-visible behavior or indicate a systemic issue worth flagging.
+
+### Key Decisions should be concise when Done already covers the implementation
+
+If the Done section explains what was built, the Key Decisions section should focus on the *why* and trade-offs — don't repeat implementation details. Use sub-bullets to keep multi-directional decisions scannable.
+
+## Structural editing rules
+
+These rules govern how bullets are organized, deduplicated, and maintained across reports.
+
+### Dedup against previous reports
+
+Before finalizing, cross-check every Done item against the most recent 1–2 reports. If an item already appeared in a prior Done section, drop it silently — don't ask the user to confirm obvious duplicates.
+
+### Consolidate related items
+
+Merge items that are part of the same effort into one bullet. A supporting artifact (e.g., a web UI panel built specifically for a pipeline) should be folded into the parent bullet as a clause, not listed separately.
+
+### Break long bullets into sub-bullets
+
+When a single bullet covers multiple directions or aspects (e.g., inbound vs. outbound authorization), split into sub-bullets for scannability rather than writing a dense paragraph.
+
+### Shorten items that recur across reports
+
+Items mentioned in multiple prior reports should get progressively shorter. First mention: full detail. Later mentions: brief reference with a priority signal. E.g., "VPN follow-up: try Korea/Japan VPS for lower latency; explore GUI client for non-technical users" → "VPN follow-up (low priority)."
+
+### Next section hygiene
+
+- Remove items from Next that are now reflected in Done.
+- Update wording of partially completed items (e.g., "Implement X" → "Debug and iterate on X (now running, needs tuning)").
+- Use parenthetical priority/sequencing signals: "(low priority)", "(after X stabilizes)" — lets the manager know relative urgency without a separate explanation.
+
+### Merging small Next items
+
+If two upcoming items are similar in scope and priority, merge them into one bullet rather than listing separately. E.g., "Implement Page History and Actor Personal Space (after ingestion pipeline stabilizes)."
+
 ## Step 4: Output format
 
 During content iteration, output both the plain-text draft (in a code block for quick reading) **and** write an `.html` file simultaneously. Every revision should update the `.html` file in sync — do not treat HTML generation as a separate final step.
@@ -145,6 +208,7 @@ These rules apply to all email output — both the plain-text draft and the HTML
 - Use `<p>`, `<strong>`, `<ul>`/`<li>`, `<a>` tags. Avoid `<div>` for layout where possible.
 - Do not use `border-radius`, `box-shadow`, `flexbox`, or `grid` — they degrade in Outlook and older clients
 - Line height: 1.6
+- `<code>` tags: add a subtle background tint for readability in both light and dark modes: `style="background-color:rgba(127,127,127,0.15); padding:1px 4px;"`
 
 **Etiquette**
 
